@@ -62,10 +62,6 @@ class ViewController: UIViewController {
         vc.navigationItem.largeTitleDisplayMode = .never
         vc.completion = {title,body,date in
             
-            print(title)
-            print(body)
-            print(date)
-            
             DispatchQueue.main.async {
                 
                 self.navigationController?.popToRootViewController(animated: true)
