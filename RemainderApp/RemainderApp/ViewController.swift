@@ -10,6 +10,8 @@ import UIKit
 class ViewController: UIViewController {
     let tableView : UITableView = {
         let table = UITableView()
+        table.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        
         return table
     } ()
     let navView = UIView()
@@ -65,6 +67,25 @@ class ViewController: UIViewController {
             DispatchQueue.main.async {
                 
                 self.navigationController?.popToRootViewController(animated: true)
+                let new = RemainderModel(title: title, date: date, indentifire: "id_\(title)",description: body)
+                self.models.append(new)
+                self.tableView.reloadData()
+                let content = UNMutableNotificationContent()
+                content.title = new.title
+                content.body = body
+                content.sound  = .default
+                
+                let trigger = UNCalendarNotificationTrigger(dateMatching: Calendar.current.dateComponents([.year,.month,.day,.hour,.minute,.second], from: date), repeats: false)
+                
+                let request = UNNotificationRequest(identifier: new.indentifire, content: content, trigger: trigger)
+                
+                
+                UNUserNotificationCenter.current().add(request) { error in
+                    if error != nil {
+                        print(error)
+                    }
+                }
+                
 
             }
         }
@@ -106,12 +127,16 @@ extension ViewController: UITableViewDataSource{
         return models.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+   
+        let  cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
+        
         cell.textLabel?.text = models[indexPath.row].title
+        let date = models[indexPath.row].date
+        let formatedDate = DateFormatter()
+        formatedDate.dateFormat = "MMM, dd, YYYY"
+        cell.detailTextLabel?.text = formatedDate.string(from: date)
         return cell
     }
-    
-    
 }
 
 
@@ -119,4 +144,5 @@ struct RemainderModel {
     let title:String
     let date : Date
     let indentifire: String
+    let description:String
 }
